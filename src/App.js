@@ -5,10 +5,35 @@ import './App.css';
 import TodoList from './components/TodoList';
 import TodoInput from './components/TodoInput';
 
+const reorder = (list, startIndex, endIndex) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};
+
 class App extends Component {
   state = {
     todos: [],
     idCount: 0
+  }
+
+  onDragEnd(result) {
+    // dropped outside the list
+    if (!result.destination) {
+      return;
+    }
+
+    const todos = reorder(
+      this.state.todos,
+      result.source.index,
+      result.destination.index
+    );
+
+    this.setState({
+      todos,
+    });
   }
 
   addTodo(todoName){
@@ -38,8 +63,12 @@ class App extends Component {
     return (
       <div className="App">
         <Card className="main-container">
-          <TodoInput handleSubmit={this.addTodo.bind(this)} />
-          <TodoList data={this.state.todos} handleClick={this.deleteTodo.bind(this)} />
+          <TodoInput handleSubmit={this.addTodo.bind(this)}/>
+          <TodoList
+            data={this.state.todos}
+            handleClick={this.deleteTodo.bind(this)}
+            onDragEnd={this.onDragEnd.bind(this)}
+          />
         </Card>
       </div>
     );
