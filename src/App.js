@@ -18,7 +18,14 @@ class App extends Component {
     todos: [],
     idCount: 0
   }
-
+  componentDidMount(){
+    const todos = JSON.parse(localStorage.getItem('todos')) || [];
+    const idCount = localStorage.getItem('idCount') || 0;
+    this.setState({
+      todos,
+      idCount
+    })
+  }
   onDragEnd(result) {
     // dropped outside the list
     if (!result.destination) {
@@ -30,10 +37,10 @@ class App extends Component {
       result.source.index,
       result.destination.index
     );
-
     this.setState({
       todos,
     });
+    localStorage.setItem('todos', JSON.stringify(todos));
   }
 
   addTodo(todoName){
@@ -42,6 +49,8 @@ class App extends Component {
         name: todoName,
         id: prevState.idCount
       });
+      localStorage.setItem('todos', JSON.stringify(newTodos));
+      localStorage.setItem('idCount', JSON.stringify(prevState.idCount));
       return {
         todos: newTodos,
         idCount: prevState.idCount + 1,
@@ -53,6 +62,7 @@ class App extends Component {
   deleteTodo(todoId){
     this.setState(prevState => {
       const newTodos = prevState.todos.slice().filter( todo => todo.id !== todoId );
+      localStorage.setItem('todos', JSON.stringify(newTodos));
       return {
         todos: newTodos
       }
